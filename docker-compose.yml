@@ -44,7 +44,7 @@ pinpoint-web:
   expose:
     - "8080"
   ports:
-    - "3080:8080"
+    - "28080:8080"
   environment:
     HBASE_HOST: hbase
     HBASE_PORT: 2181
