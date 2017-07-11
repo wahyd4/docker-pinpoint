@@ -19,7 +19,7 @@ services:
   pinpoint-mysql:
     container_name: pinpoint-mysql
     restart: always
-    image: pinpointmysql:latest
+    image: marcosamm/pinpoint-mysql:1.6.2
     ports:
       - "13306:3306"
     environment:
