@@ -4,7 +4,7 @@
 
 FROM alpine:3.5
 
-ENV PINPOINT_VERSION=1.6.1
+ENV PINPOINT_VERSION=1.6.2
 
 ADD configure-agent.sh /usr/local/bin/
 
