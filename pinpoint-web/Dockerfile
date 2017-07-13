@@ -4,7 +4,7 @@
 
 FROM tomcat:8-jre8
 
-ENV PINPOINT_VERSION=1.6.1
+ENV PINPOINT_VERSION=1.6.2
 
 ADD start-web.sh /usr/local/bin/
 
@@ -21,4 +21,3 @@ RUN chmod a+x /usr/local/bin/start-web.sh \
 EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/start-web.sh"]
-
