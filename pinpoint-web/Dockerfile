@@ -21,4 +21,3 @@ RUN chmod a+x /usr/local/bin/start-web.sh \
 EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/start-web.sh"]
-
