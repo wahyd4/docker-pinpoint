@@ -30,12 +30,12 @@ services:
       TZ: "America/Recife"
     volumes:
       - mysql_data:/var/lib/mysql
-  
+
   pinpoint-collector:
     depends_on:
       - pinpoint-hbase
     container_name: pinpoint-collector
-    image: wahyd4/pinpoint-collector:1.6.2
+    image: marcosamm/pinpoint-collector:1.6.2
     restart: always
     expose:
       - "9994"
@@ -57,13 +57,13 @@ services:
       CLUSTER_ZOOKEEPER_ADDRESS: pinpoint-hbase
       DISABLE_DEBUG: 'true'
       TZ: "America/Recife"
-  
+
   pinpoint-web:
     depends_on:
       - pinpoint-hbase
       - pinpoint-mysql
     container_name: pinpoint-web
-    image: wahyd4/pinpoint-web:1.6.2
+    image: marcosamm/pinpoint-web:1.6.2
     restart: always
     expose:
       - "8080"
