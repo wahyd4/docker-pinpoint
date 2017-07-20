@@ -20,7 +20,7 @@ PROFILER_JSON_JSONLIB=${PROFILER_JSON_JSONLIB:-false}
 
 DISABLE_DEBUG=${DISABLE_DEBUG:-true}
 
-cp -f /assets/pinpoint.config /assets/pinpoint-agent/pinpoint.config
+cp -f /assets/pinpoint.config ${PINPOINT_AGENT_HOME}/pinpoint.config
 
 sed -i "s/profiler.collector.ip=127.0.0.1/profiler.collector.ip=${COLLECTOR_IP}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
 
