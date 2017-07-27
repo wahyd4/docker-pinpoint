@@ -23,3 +23,4 @@ RUN apk add --update curl bash \
 VOLUME ["/assets/pinpoint-agent"]
 
 ENTRYPOINT ["/usr/local/bin/configure-agent.sh"]
+CMD ["tail -f /dev/null"]

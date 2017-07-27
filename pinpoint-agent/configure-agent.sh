@@ -2,42 +2,57 @@
 set -e
 set -x
 
-PINPOINT_AGENT_HOME=${PINPOINT_AGENT_HOME:-/assets/pinpoint-agent}
+PINPOINT_AGENT_HOME=${PINPOINT_AGENT_HOME:-/opt/pinpoint-agent}
 
-COLLECTOR_IP=${COLLECTOR_IP:-127.0.0.1}
-COLLECTOR_TCP_PORT=${COLLECTOR_TCP_PORT:-9994}
-COLLECTOR_UDP_STAT_LISTEN_PORT=${COLLECTOR_UDP_STAT_LISTEN_PORT:-9995}
-COLLECTOR_UDP_SPAN_LISTEN_PORT=${COLLECTOR_UDP_SPAN_LISTEN_PORT:-9996}
+COLLECTOR_IP=${COLLECTOR_IP:-}
+COLLECTOR_TCP_PORT=${COLLECTOR_TCP_PORT:-}
+COLLECTOR_UDP_STAT_LISTEN_PORT=${COLLECTOR_UDP_STAT_LISTEN_PORT:-}
+COLLECTOR_UDP_SPAN_LISTEN_PORT=${COLLECTOR_UDP_SPAN_LISTEN_PORT:-}
 
-PROFILER_SAMPLING_RATE=${PROFILER_SAMPLING_RATE:-20}
+PROFILER_SAMPLING_RATE=${PROFILER_SAMPLING_RATE:-}
 
 PROFILER_APPLICATIONSERVERTYPE=${PROFILER_APPLICATIONSERVERTYPE:-}
-PROFILER_TOMCAT_CONDITIONAL_TRANSFORM=${PROFILER_TOMCAT_CONDITIONAL_TRANSFORM:-true}
+PROFILER_TOMCAT_CONDITIONAL_TRANSFORM=${PROFILER_TOMCAT_CONDITIONAL_TRANSFORM:-}
 
-PROFILER_JSON_GSON=${PROFILER_JSON_GSON:-false}
-PROFILER_JSON_JACKSON=${PROFILER_JSON_JACKSON:-false}
-PROFILER_JSON_JSONLIB=${PROFILER_JSON_JSONLIB:-false}
+PROFILER_JSON_GSON=${PROFILER_JSON_GSON:-}
+PROFILER_JSON_JACKSON=${PROFILER_JSON_JACKSON:-}
+PROFILER_JSON_JSONLIB=${PROFILER_JSON_JSONLIB:-}
 
 DISABLE_DEBUG=${DISABLE_DEBUG:-true}
 
-cp -f /assets/pinpoint.config ${PINPOINT_AGENT_HOME}/pinpoint.config
-
-sed -i "s/profiler.collector.ip=127.0.0.1/profiler.collector.ip=${COLLECTOR_IP}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-
-sed -i "s/profiler.collector.tcp.port=9994/profiler.collector.tcp.port=${COLLECTOR_TCP_PORT}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-sed -i "s/profiler.collector.stat.port=9995/profiler.collector.stat.port=${COLLECTOR_UDP_STAT_LISTEN_PORT}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-sed -i "s/profiler.collector.span.port=9996/profiler.collector.span.port=${COLLECTOR_UDP_SPAN_LISTEN_PORT}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-sed -i "s/profiler.sampling.rate=20/profiler.sampling.rate=${PROFILER_SAMPLING_RATE}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-if [ "$PROFILER_APPLICATIONSERVERTYPE" != "" ]; then
-    sed -i "s/#profiler.applicationservertype=TOMCAT/profiler.applicationservertype=${PROFILER_APPLICATIONSERVERTYPE}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
+if [ "$COLLECTOR_IP" != "" ]; then
+    sed -i "/profiler.collector.ip=/ s/=.*/=${COLLECTOR_IP}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
 fi
-sed -i "s/profiler.tomcat.conditional.transform=true/profiler.tomcat.conditional.transform=${PROFILER_TOMCAT_CONDITIONAL_TRANSFORM}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-sed -i "s/profiler.json.gson=false/profiler.json.gson=${PROFILER_JSON_GSON}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-sed -i "s/profiler.json.jackson=false/profiler.json.jackson=${PROFILER_JSON_JACKSON}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
-sed -i "s/profiler.json.jsonlib=false/profiler.json.jsonlib=${PROFILER_JSON_JSONLIB}/g" ${PINPOINT_AGENT_HOME}/pinpoint.config
+if [ "$COLLECTOR_TCP_PORT" != "" ]; then
+    sed -i "/profiler.collector.tcp.port=/ s/=.*/=${COLLECTOR_TCP_PORT}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$COLLECTOR_UDP_STAT_LISTEN_PORT" != "" ]; then
+    sed -i "/profiler.collector.stat.port=/ s/=.*/=${COLLECTOR_UDP_STAT_LISTEN_PORT}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$COLLECTOR_UDP_SPAN_LISTEN_PORT" != "" ]; then
+    sed -i "/profiler.collector.span.port=/ s/=.*/=${COLLECTOR_UDP_SPAN_LISTEN_PORT}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$PROFILER_SAMPLING_RATE" != "" ]; then
+    sed -i "/profiler.sampling.rate=/ s/=.*/=${PROFILER_SAMPLING_RATE}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$PROFILER_APPLICATIONSERVERTYPE" != "" ]; then
+    sed -i "/#profiler.applicationservertype=/ s/=.*/=${PROFILER_APPLICATIONSERVERTYPE}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$PROFILER_TOMCAT_CONDITIONAL_TRANSFORM" != "" ]; then
+    sed -i "/profiler.tomcat.conditional.transform=/ s/=.*/=${PROFILER_TOMCAT_CONDITIONAL_TRANSFORM}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$PROFILER_JSON_GSON" != "" ]; then
+    sed -i "/profiler.json.gson=/ s/=.*/=${PROFILER_JSON_GSON}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$PROFILER_JSON_JACKSON" != "" ]; then
+    sed -i "/profiler.json.jackson=/ s/=.*/=${PROFILER_JSON_JACKSON}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
+if [ "$PROFILER_JSON_JSONLIB" != "" ]; then
+    sed -i "/profiler.json.jsonlib=/ s/=.*/=${PROFILER_JSON_JSONLIB}/" ${PINPOINT_AGENT_HOME}/pinpoint.config
+fi
 
 if [ "$DISABLE_DEBUG" == "true" ]; then
     sed -i 's/level value="DEBUG"/level value="INFO"/' ${PINPOINT_AGENT_HOME}/lib/log4j.xml
 fi
 
-exec tail -f /dev/null
+exec "$@"
