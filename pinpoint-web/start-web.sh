@@ -28,7 +28,8 @@ jdbc.username=${JDBC_USERNAME}
 jdbc.password=${JDBC_PASSWORD}
 " > /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/jdbc.properties
 
-MAIL_ENABLE=${MAIL_ENABLE:-false}
+BATCH_ENABLE=${BATCH_ENABLE:-false}
+BATCH_SERVER_IP=${BATCH_SERVER_IP:-127.0.0.1}
 MAIL_HOST=${MAIL_HOST:-}
 MAIL_PORT=${MAIL_PORT:-}
 MAIL_USERNAME=${MAIL_USERNAME:-}
@@ -41,67 +42,89 @@ MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE=${MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE:-tru
 MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED=${MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED:-}
 MAIL_PROPERTIES_MAIL_DEBUG=${MAIL_PROPERTIES_MAIL_DEBUG:-}
 
-cp /assets/pinpoint-web.properties /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/pinpoint-web.properties
-cp /assets/hbase.properties /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/hbase.properties
+#Manipuled files with SED
+WEB_INF_CLASSES_DIR=/usr/local/tomcat/webapps/ROOT/WEB-INF/classes
+BATCH_PROPERTIES_FILE=${WEB_INF_CLASSES_DIR}/batch.properties
+HBASE_PROPERTIES_FILE=${WEB_INF_CLASSES_DIR}/hbase.properties
+PINPOINT_WEB_PROPERTIES_FILE=${WEB_INF_CLASSES_DIR}/pinpoint-web.properties
+APPLICATION_CONTEXT_WEB_FILE=${WEB_INF_CLASSES_DIR}/applicationContext-web.xml
+APPLICATION_CONTEXT_MAIL_FILE=${WEB_INF_CLASSES_DIR}/applicationContext-mail.xml
+LOG4J_FILE=${WEB_INF_CLASSES_DIR}/log4j.xml
 
-sed -i "s/cluster.enable=true/cluster.enable=${CLUSTER_ENABLE}/g" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/pinpoint-web.properties
-sed -i "s/cluster.zookeeper.address=localhost/cluster.zookeeper.address=${CLUSTER_ZOOKEEPER_ADDRESS}/g" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/pinpoint-web.properties
+cp /assets/pinpoint-web.properties ${PINPOINT_WEB_PROPERTIES_FILE}
+cp /assets/hbase.properties ${HBASE_PROPERTIES_FILE}
+
+sed -i "s/cluster.enable=true/cluster.enable=${CLUSTER_ENABLE}/g" ${PINPOINT_WEB_PROPERTIES_FILE}
+sed -i "s/cluster.zookeeper.address=localhost/cluster.zookeeper.address=${CLUSTER_ZOOKEEPER_ADDRESS}/g" ${PINPOINT_WEB_PROPERTIES_FILE}
 if [ "$CLUSTER_WEB_TCP_PORT" != "" ]; then
-    sed -i "/cluster.web.tcp.port=/ s/=.*/=${CLUSTER_WEB_TCP_PORT}/" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/pinpoint-web.properties
+    sed -i "/cluster.web.tcp.port=/ s/=.*/=${CLUSTER_WEB_TCP_PORT}/" ${PINPOINT_WEB_PROPERTIES_FILE}
 fi
 if [ "$CLUSTER_CONNECT_ADDRESS" != "" ]; then
-    sed -i "/cluster.connect.address=/ s/=.*/=${CLUSTER_CONNECT_ADDRESS}/" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/pinpoint-web.properties
+    sed -i "/cluster.connect.address=/ s/=.*/=${CLUSTER_CONNECT_ADDRESS}/" ${PINPOINT_WEB_PROPERTIES_FILE}
 fi
 
-sed -i "s/admin.password=admin/admin.password=${ADMIN_PASSWORD}/g" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/pinpoint-web.properties
+sed -i "s/admin.password=admin/admin.password=${ADMIN_PASSWORD}/g" ${PINPOINT_WEB_PROPERTIES_FILE}
 
-sed -i "s/hbase.client.host=localhost/hbase.client.host=${HBASE_HOST}/g" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/hbase.properties
-sed -i "s/hbase.client.port=2181/hbase.client.port=${HBASE_PORT}/g" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/hbase.properties
+sed -i "s/hbase.client.host=localhost/hbase.client.host=${HBASE_HOST}/g" ${HBASE_PROPERTIES_FILE}
+sed -i "s/hbase.client.port=2181/hbase.client.port=${HBASE_PORT}/g" ${HBASE_PROPERTIES_FILE}
 
 if [ "$CONFIG_SENDUSAGE" != "" ]; then
-    sed -i "/config.sendUsage=/ s/=.*/=${CONFIG_SENDUSAGE}/" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/pinpoint-web.properties
+    sed -i "/config.sendUsage=/ s/=.*/=${CONFIG_SENDUSAGE}/" ${PINPOINT_WEB_PROPERTIES_FILE}
 fi
 
 if [ "$DISABLE_DEBUG" == "true" ]; then
-    sed -i 's/level value="DEBUG"/level value="INFO"/' /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/log4j.xml
+    sed -i 's/level value="DEBUG"/level value="INFO"/' ${LOG4J_FILE}
 fi
 
-if [ "$MAIL_ENABLE" == "true" ]; then
-    sed -i 's/<\/beans>/<import resource="classpath:applicationContext-mail.xml" \/><\/beans>/' /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-web.xml
+if [ "$BATCH_ENABLE" == "true" ]; then
+    sed -i "/batch.enable=/ s/=.*/=${BATCH_ENABLE}/" ${BATCH_PROPERTIES_FILE}
+    
+    if [ "$BATCH_SERVER_IP" != "" ]; then
+        sed -i "/batch.server.ip=/ s/=.*/=${BATCH_SERVER_IP}/" ${BATCH_PROPERTIES_FILE}
+    fi
+    
+    sed -i 's/<\/beans>/<import resource="classpath:applicationContext-mail.xml" \/><\/beans>/' ${APPLICATION_CONTEXT_WEB_FILE}
 	
-	if [ "$MAIL_HOST" != "" ]; then
-        sed -i "s/smtp.gmail.com/${MAIL_HOST}/" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PORT" != "" ]; then
-        sed -i "s/587/${MAIL_PORT}/" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_USERNAME" != "" ]; then
-        sed -i "s/UserName/${MAIL_USERNAME}/" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PASSWORD" != "" ]; then
-        sed -i "s/PassWord/${MAIL_PASSWORD}/" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PROPERTIES_MAIL_TRANSPORT_PROTOCOL" != "" ]; then
-	    sed -i "/mail.transport.protocol/ s/<\!-- //; s/ -->//; s/>.*</>${MAIL_PROPERTIES_MAIL_TRANSPORT_PROTOCOL}</" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PROPERTIES_MAIL_SMTP_PORT" != "" ]; then
-		sed -i "/mail.smtp.port/ s/<\!-- //; s/ -->//; s/>.*</>${MAIL_PROPERTIES_MAIL_SMTP_PORT}</" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PROPERTIES_MAIL_SMTP_AUTH" != "" ]; then
-		sed -i "/mail.smtp.auth/ s/<\!-- //; s/ -->//; s/>.*</>${MAIL_PROPERTIES_MAIL_SMTP_AUTH}</" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PROPERTIES_MAIL_SMTP_FROM" != "" ]; then
-		sed -i "/mail.smtp.from/ s/<\!-- //; s/ -->//; s/>.*</>${MAIL_PROPERTIES_MAIL_SMTP_FROM}</" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE" != "" ]; then
-		sed -i "/mail.smtp.starttls.enable/ s/<\!-- //; s/ -->//; s/>.*</>${MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE}</" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED" != "" ]; then
-		sed -i "/mail.smtp.starttls.required/ s/<\!-- //; s/ -->//; s/>.*</>${MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED}</" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
-	if [ "$MAIL_PROPERTIES_MAIL_DEBUG" != "" ]; then
-		sed -i "/mail.debug/ s/<\!-- //; s/ -->//; s/>.*</>${MAIL_PROPERTIES_MAIL_DEBUG}</" /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/applicationContext-mail.xml
-	fi
+    if [ "$MAIL_HOST" != "" ]; then
+        sed -i "s/smtp.gmail.com/${MAIL_HOST}/" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PORT" != "" ]; then
+        sed -i "s/587/${MAIL_PORT}/" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_USERNAME" != "" ]; then
+        sed -i "s/UserName/${MAIL_USERNAME}/" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PASSWORD" != "" ]; then
+        sed -i "s/PassWord/${MAIL_PASSWORD}/" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PROPERTIES_MAIL_TRANSPORT_PROTOCOL" != "" ]; then
+    	PATTERN="mail.transport.protocol"
+        sed -i "/${PATTERN}/ s/<\!-- \| -->//g;/${PATTERN}/ s/>.*</>${MAIL_PROPERTIES_MAIL_TRANSPORT_PROTOCOL}</" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PROPERTIES_MAIL_SMTP_PORT" != "" ]; then
+    	PATTERN="mail.smtp.port"
+        sed -i "/${PATTERN}/ s/<\!-- \| -->//g;/${PATTERN}/ s/>.*</>${MAIL_PROPERTIES_MAIL_SMTP_PORT}</" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PROPERTIES_MAIL_SMTP_AUTH" != "" ]; then
+    	PATTERN="mail.smtp.auth"
+        sed -i "/${PATTERN}/ s/<\!-- \| -->//g;/${PATTERN}/ s/>.*</>${MAIL_PROPERTIES_MAIL_SMTP_AUTH}</" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PROPERTIES_MAIL_SMTP_FROM" != "" ]; then
+    	PATTERN="mail.smtp.from"
+        sed -i "/${PATTERN}/ s/<\!-- \| -->//g;/${PATTERN}/ s/>.*</>${MAIL_PROPERTIES_MAIL_SMTP_FROM}</" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE" != "" ]; then
+    	PATTERN="mail.smtp.starttls.enable"
+        sed -i "/${PATTERN}/ s/<\!-- \| -->//g;/${PATTERN}/ s/>.*</>${MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE}</" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED" != "" ]; then
+    	PATTERN="mail.smtp.starttls.required"
+        sed -i "/${PATTERN}/ s/<\!-- \| -->//g;/${PATTERN}/ s/>.*</>${MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED}</" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
+    if [ "$MAIL_PROPERTIES_MAIL_DEBUG" != "" ]; then
+    	PATTERN="mail.debug"
+        sed -i "/${PATTERN}/ s/<\!-- \| -->//g;/${PATTERN}/ s/>.*</>${MAIL_PROPERTIES_MAIL_DEBUG}</" ${APPLICATION_CONTEXT_MAIL_FILE}
+    fi
 	
 fi
 
