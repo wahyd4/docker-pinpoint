@@ -55,6 +55,8 @@ services:
       COLLECTOR_UDP_SPAN_LISTEN_PORT: 9996
       CLUSTER_ENABLE: 'true'
       CLUSTER_ZOOKEEPER_ADDRESS: pinpoint-hbase
+#      CLUSTER_LISTEN_IP:
+#      CLUSTER_LISTEN_PORT
       DISABLE_DEBUG: 'true'
       TZ: "America/Recife"
   
@@ -77,25 +79,27 @@ services:
       CLUSTER_ENABLE: 'true'
       CLUSTER_ZOOKEEPER_ADDRESS: pinpoint-hbase
       CLUSTER_WEB_TCP_PORT: 9997
-      CONFIG_SENDUSAGE: 'false'
+#      CLUSTER_CONNECT_ADDRESS:  
+#      CONFIG_SENDUSAGE: 'false'
       ADMIN_PASSWORD: admin123
       DISABLE_DEBUG: 'true'
       JDBC_DRIVER: com.mysql.jdbc.Driver
       JDBC_URL: jdbc:mysql://pinpoint-mysql:3306/pinpoint?characterEncoding=UTF-8
       JDBC_USERNAME: admin
       JDBC_PASSWORD: admin
-      MAIL_ENABLE: 'true'
+      BATCH_ENABLE: 'true'
+#      BATCH_SERVER_IP: 127.0.0.1
       MAIL_HOST: stmp.test.com
       MAIL_PORT: 123
       MAIL_USERNAME: user
       MAIL_PASSWORD: pass
-      MAIL_PROPERTIES_MAIL_TRANSPORT_PROTOCOL: smtp
+#      MAIL_PROPERTIES_MAIL_TRANSPORT_PROTOCOL: smtp
       MAIL_PROPERTIES_MAIL_SMTP_AUTH: 'true'
       MAIL_PROPERTIES_MAIL_SMTP_PORT: 587
-      MAIL_PROPERTIES_MAIL_SMTP_FROM: test@example.com
+#      MAIL_PROPERTIES_MAIL_SMTP_FROM: test@example.com
       MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE: 'true'
-      MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED: 'true'
-      MAIL_PROPERTIES_MAIL_DEBUG: 'true'
+#      MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED: 'true'
+#      MAIL_PROPERTIES_MAIL_DEBUG: 'true'
       TZ: "America/Recife"
 
 volumes:
