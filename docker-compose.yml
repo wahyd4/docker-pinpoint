@@ -67,19 +67,35 @@ services:
     restart: always
     expose:
       - "8080"
+      - "9997"
     ports:
+      - "9997:9997/tcp"
       - "28080:8080"
     environment:
       HBASE_HOST: pinpoint-hbase
       HBASE_PORT: 2181
       CLUSTER_ENABLE: 'true'
       CLUSTER_ZOOKEEPER_ADDRESS: pinpoint-hbase
+      CLUSTER_WEB_TCP_PORT: 9997
+      CONFIG_SENDUSAGE: 'false'
       ADMIN_PASSWORD: admin123
       DISABLE_DEBUG: 'true'
       JDBC_DRIVER: com.mysql.jdbc.Driver
       JDBC_URL: jdbc:mysql://pinpoint-mysql:3306/pinpoint?characterEncoding=UTF-8
       JDBC_USERNAME: admin
       JDBC_PASSWORD: admin
+      MAIL_ENABLE: 'true'
+      MAIL_HOST: stmp.test.com
+      MAIL_PORT: 123
+      MAIL_USERNAME: user
+      MAIL_PASSWORD: pass
+      MAIL_PROPERTIES_MAIL_TRANSPORT_PROTOCOL: smtp
+      MAIL_PROPERTIES_MAIL_SMTP_AUTH: 'true'
+      MAIL_PROPERTIES_MAIL_SMTP_PORT: 587
+      MAIL_PROPERTIES_MAIL_SMTP_FROM: test@example.com
+      MAIL_PROPERTIES_MAIL_STARTTLS_ENABLE: 'true'
+      MAIL_PROPERTIES_MAIL_STARTTLS_REQUIRED: 'true'
+      MAIL_PROPERTIES_MAIL_DEBUG: 'true'
       TZ: "America/Recife"
 
 volumes:

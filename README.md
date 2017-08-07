@@ -46,6 +46,9 @@ profiler.collector.tcp.port=9994
 java  -javaagent:/some-absolute-path/pinpoint-agent-1.6.2/pinpoint-bootstrap-1.6.2.jar -Dpinpoint.agentId=some-union-id -Dpinpoint.applicationName=some-name -jar build/libs/wise-log-1.0.0-SNAPSHOT.jar
 
 ```
+
+[See more examples of monitoring](examples) using docker-compose, image docker, monitoring tests with selenium, ...
+
 You can find more samples at: <https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples>
 
 If you plan to use external volumes for hbase you should fill hbase first.
