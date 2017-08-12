@@ -1,21 +1,34 @@
 # Monitoring joinfaces-example application with docker image
 This example shows how to run and monitor the joinfaces-example application with pinpoint-agent
 
-### To build the image
+## Running with [Dockerfile](Dockerfile)
+### - To build the image
 ```
 docker build -t joinfaces-example-with-pinpoint-agent .
 ```
 
-### To run container
+### - To run container
 ```
 docker run -d -p 8080:8080 joinfaces-example-with-pinpoint-agent
 ```
 
-### To access
+## Running without Dockerfile
+```
+docker run -it --rm \
+   -e COLLECTOR_IP="192.168.0.18" \
+   -p 8080:8080 \
+   -v /home/marcosamm/apps/joinfaces-example-2.4.0-SNAPSHOT.jar:/opt/apps/app.jar \
+   marcosamm/pinpointagent-oraclejre \
+   /bin/sh -c "java -javaagent:/opt/pinpoint-agent/pinpoint-bootstrap.jar -Dpinpoint.agentId=agent1 -Dpinpoint.applicationName=joinfaces-example -jar /opt/apps/app.jar"
+```
+See too:
+* [marcosamm/pinpointagent-oraclejre](https://hub.docker.com/r/marcosamm/pinpointagent-oraclejre/)
+* [marcosamm/pinpointagent-openjre](https://hub.docker.com/r/marcosamm/pinpointagent-openjre/) 
+
+## To access
 http://localhost:8080
 
-
-### Note
+## Notes
 * The following environment variables can be used to set pinpoint-agent configuration properties (pinpoint.config):
    - COLLECTOR_IP
    - PROFILER_APPLICATIONSERVERTYPE

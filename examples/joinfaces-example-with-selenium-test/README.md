@@ -1,12 +1,13 @@
 # Monitoring joinfaces-example application with selenium tests
 This example shows how to monitor the joinfaces-example application while running automated tests
 
-### To build the image
+## Running with [Dockerfile](Dockerfile)
+### - To build the image
 ```
 docker build -t joinfaces-exemple-with-pinpoint-agent .
 ```
 
-### To run container
+### - To run container
 ```
 docker run -it \
    -e COLLECTOR_IP="198.162.0.18" \
@@ -21,11 +22,26 @@ docker run -it \
    /bin/sh -c "xvfb-run mvn -DwebDriverType=chrome install verify"
 ```
 
-### To access
-http://localhost:8080
+## Running without Dockerfile
+```
+docker run -it --rm \
+   -e COLLECTOR_IP="192.168.0.18" \
+   -e PROFILER_APPLICATIONSERVERTYPE="TOMCAT" \
+   -e PROFILER_TOMCAT_CONDITIONAL_TRANSFORM="false" \
+   -v /home/marcosamm/git/joinfaces-example/:/opt/app/ \
+   -v /home/marcosamm/.m2/repository:/root/.m2/repository \
+   marcosamm/pinpointagent-firefox-maven-oraclejdk \
+   /bin/sh -c "cd /opt/app/; xvfb-run mvn clean install verify"
+```
+See too:
+* [marcosamm/pinpointagent-chrome-maven-openjdk](https://hub.docker.com/r/marcosamm/pinpointagent-chrome-maven-openjdk/)
+* [marcosamm/pinpointagent-chrome-maven-oraclejdk](https://hub.docker.com/r/marcosamm/pinpointagent-chrome-maven-oraclejdk/)
+* [marcosamm/pinpointagent-chromium-maven-openjdk](https://hub.docker.com/r/marcosamm/pinpointagent-chromium-maven-openjdk/)
+* [marcosamm/pinpointagent-chromium-maven-oraclejdk](https://hub.docker.com/r/marcosamm/pinpointagent-chromium-maven-oraclejdk/)
+* [marcosamm/pinpointagent-firefox-maven-openjdk](https://hub.docker.com/r/marcosamm/pinpointagent-firefox-maven-openjdk/)
+* [marcosamm/pinpointagent-firefox-maven-oraclejdk](https://hub.docker.com/r/marcosamm/pinpointagent-firefox-maven-oraclejdk/)
 
-
-### Note
+## Notes
 * The following environment variables can be used to set pinpoint-agent configuration properties (pinpoint.config):
    - COLLECTOR_IP
    - PROFILER_APPLICATIONSERVERTYPE
