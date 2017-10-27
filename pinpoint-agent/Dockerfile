@@ -18,7 +18,7 @@ RUN apk add --update curl bash \
     && sed -i 's/DEBUG/INFO/' $PINPOINT_AGENT_HOME/lib/log4j.xml \
     && rm pinpoint-agent-$PINPOINT_VERSION.tar \
     && cd $PINPOINT_AGENT_HOME \
-    && mv pinpoint-bootstrap-$PINPOINT_VERSION.jar pinpoint-bootstrap.jar
+    && mv pinpoint-bootstrap-$PINPOINT_VERSION.jar pinpoint-bootstrap.jar \
     && apk del curl \
     && rm /var/cache/apk/*
 
